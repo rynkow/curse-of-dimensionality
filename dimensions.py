@@ -5,11 +5,26 @@ import matplotlib.pyplot as plt
 
 
 def fill_hypercube(dimension, no_of_points):
+    """
+    Uniformly fills a hypercube with a desired number of points.
+    Arguments:
+    dimension: hypercube dimension
+    no_of_points: desired no of points
+    Returns:
+        list of points filling the hypercube
+    """
     points = [np.random.uniform(0, 1, dimension) for i in range(no_of_points)]
     return points
 
 
 def choose_vector(points):
+    """
+    Get random vector by choosing and removing 2 points from a given list of points.
+    Arguments:
+    points: list of points
+    Returns:
+        vector
+    """
     start = points.pop(np.random.randint(0, len(points)))
     end = points.pop(np.random.randint(0, len(points)))
     vector = end - start
@@ -17,10 +32,25 @@ def choose_vector(points):
 
 
 def choose_point(points):
+    """
+    Get random point by choosing and removing a point from a given list of points.
+    Arguments:
+    points: list of points
+    Returns:
+        randomly chosen point
+    """
     return points.pop(np.random.randint(0, len(points)))
 
 
 def angle_between_vectors(vector1, vector2):
+    """
+    Calculate an angle between two vectors
+    Arguments:
+    vector1: a vector
+    vector2: a vector
+    Returns:
+        angle between vector1 and vector2
+    """
     unit_vector1 = vector1 / np.linalg.norm(vector1)
     unit_vector2 = vector2 / np.linalg.norm(vector2)
     dot_product = np.dot(unit_vector1, unit_vector2)
@@ -29,14 +59,31 @@ def angle_between_vectors(vector1, vector2):
 
 
 def euclidean_distance(point1, point2):
+    """
+    Calculate euclidean distance between two points
+    Arguments:
+    point1: a point
+    point2: a point
+    Returns:
+        euclidean distance between point1 and point1
+    """
     distance = point1 - point2
     distance = np.power(distance, 2)
     distance = np.sqrt(np.sum(distance))
     return distance
 
 
-
 def random_angles_experiment(tested_dimensions, no_of_points, no_of_chosen_vector_pairs, output_dir):
+    """
+    Check how angles between vectors, given by selecting random points in filled hypercube, change in higher-dimensional spaces.
+    Generate charts in specified directory.
+
+    Arguments:
+        tested_dimensions: list of dimensions to include in experiment
+        no_of_points: number of points to fill the hypercube with
+        no_of_chosen_vector_pairs: number of vector pairs to choose while testing a dimension
+        output_dir: path to a directory in which output charts will be saved (relative to the script location)
+    """
 
     def test_dimension(tested_dimension):
         points = fill_hypercube(tested_dimension, no_of_points)
@@ -86,6 +133,20 @@ def random_angles_experiment(tested_dimensions, no_of_points, no_of_chosen_vecto
 
 
 def random_distances_experiment(tested_dimensions, no_of_points, no_of_samples, output_dir):
+    """
+    Check how distance between points change in higher-dimensional spaces, by:
+        1. filling a hypercube with points uniformly
+        2. choosing a random starting point from the hypercube
+        3. choosing two random points from the hypercube and calculating their euclidean distance to the starting point
+        4. checking how big the difference between those distances is in comparison to the average distance.
+    Saves chart with experiment results in specified directory
+
+    Arguments:
+        tested_dimensions: list of dimensions to include in experiment
+        no_of_points: number of points to fill the hypercube with
+        no_of_samples: how many checks perform for any tested dimension
+        output_dir: path to a directory in which output chart will be saved (relative to the script location)
+    """
 
     def test_difference_in_distance_relative_to_avg_distance(point1, point2, point3):
         distance_1_2 = euclidean_distance(point1, point2)
@@ -96,7 +157,6 @@ def random_distances_experiment(tested_dimensions, no_of_points, no_of_samples, 
 
     def test_dimension(tested_dimension):
         points = fill_hypercube(tested_dimension, no_of_points)
-        point1, point2, point3 = [choose_point(points) for _ in range(3)]
         return [test_difference_in_distance_relative_to_avg_distance(*[choose_point(points) for _ in range(3)]) for _ in range(no_of_samples)]
 
     test_results = [test_dimension(dimension) for dimension in tested_dimensions]
